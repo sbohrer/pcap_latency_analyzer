@@ -492,27 +492,20 @@ static void NodeOutput(HashNode_t* N)
 		TS0 	= N->TS[0];
 		FID0 	= N->FID[0];
 
-		// find the first instance with FID0
 		for (int c =0; c < N->Cnt; c++)
 		{
 			if (c >= NODE_DEPTH) break;
 
+			// find the first instance with FID0
 			if ((N->FID[c] == FID0) && (N->TS[c] < TS0))
 			{
 				TS0 = N->TS[c];
 			}
-		}
-
-		// find first instance with !FID0 
-
-		for (int c =0; c < N->Cnt; c++)
-		{
-			if (c >= NODE_DEPTH) break;
-
-			if ((N->FID[c] != FID0) && (N->TS[c] < TS1))
+			// find first instance with !FID0
+			else if ((N->FID[c] != FID0) && (N->TS[c] < TS1))
 			{
-				TS1 	= N->TS[c];
-				FID1 	= N->FID[c];
+				TS1	= N->TS[c];
+				FID1	= N->FID[c];
 			}
 		}
 
