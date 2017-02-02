@@ -960,8 +960,15 @@ static void UDPProcess(u32 FID, PCAPPacket_t* Pkt, fEther_t* E, IP4Header_t* IP4
 	if (!s_UDPEnable) return;
 
 	UDPHeader_t* UDP 	= (UDPHeader_t*)( ((u8*)IP4) + IPOffset);
-	u8* Payload		= (u8*)(UDP + 1);
-	u32 Length		= swap16(UDP->Length) - sizeof(UDPHeader_t) - s_UDPLengthChomp;
+	// UDP Payload Only
+	//u8* Payload		= (u8*)(UDP + 1);
+	//u32 Length		= swap16(UDP->Length) - sizeof(UDPHeader_t) - s_UDPLengthChomp;
+
+	// UDP Payload and UDP header
+	u8* Payload		= (u8*)UDP;
+	u32 Length		= swap16(UDP->Length) - s_UDPLengthChomp;
+
+
 
 	if (Length > 16*1024)
 	{
