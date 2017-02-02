@@ -272,19 +272,20 @@ static fEther_t * PCAPETHHeader(PCAPPacket_t* Pkt)
 
 static IP4Header_t* PCAPIP4Header(PCAPPacket_t* Pkt)
 {
-	fEther_t* E = (fEther_t*)(Pkt+1);	
+	fEther_t* E = PCAPETHHeader(Pkt);
+	IP4Header_t* IP4;
 
-	IP4Header_t* IP4 = (IP4Header_t*)(E + 1);
-	u32 IPOffset = (IP4->Version & 0x0f)*4; 
+	if (swap16(E->Proto) == ETHER_PROTO_VLAN)
+		IP4 = (IP4Header_t*)(((u8*)E) + sizeof(fEther_t) + 4);
+	else
+		IP4 = (IP4Header_t*)(E + 1);
 
 	return IP4;
 }
 
 static TCPHeader_t* PCAPTCPHeader(PCAPPacket_t* Pkt)
 {
-	fEther_t* E = (fEther_t*)(Pkt+1);	
-
-	IP4Header_t* IP4 = (IP4Header_t*)(E + 1);
+	IP4Header_t* IP4 = PCAPIP4Header(Pkt);
 	u32 IPOffset = (IP4->Version & 0x0f)*4; 
 
 	TCPHeader_t* TCP = (TCPHeader_t*)( ((u8*)IP4) + IPOffset);
@@ -295,9 +296,7 @@ static TCPHeader_t* PCAPTCPHeader(PCAPPacket_t* Pkt)
 
 static UDPHeader_t* PCAPUDPHeader(PCAPPacket_t* Pkt)
 {
-	fEther_t* E = (fEther_t*)(Pkt+1);	
-
-	IP4Header_t* IP4 = (IP4Header_t*)(E + 1);
+	IP4Header_t* IP4 = PCAPIP4Header(Pkt);
 	u32 IPOffset = (IP4->Version & 0x0f)*4; 
 
 	UDPHeader_t* UDP = (UDPHeader_t*)( ((u8*)IP4) + IPOffset);
@@ -413,7 +412,6 @@ static void TracePacket(HashNode_t* N)
 
 		case PKTTYPE_TCP:
 		{
-			fEther_t* 	 ETHn = PCAPETHHeader( N->Pkt[c] );
 			IP4Header_t* IP4n = PCAPIP4Header( N->Pkt[c] );
 			TCPHeader_t* TCPn = PCAPTCPHeader( N->Pkt[c] );
 
@@ -439,7 +437,6 @@ static void TracePacket(HashNode_t* N)
 
 		case PKTTYPE_UDP:
 		{
-			fEther_t* 	 ETHn = PCAPETHHeader( N->Pkt[c] );
 			IP4Header_t* IP4n = PCAPIP4Header( N->Pkt[c] );
 			UDPHeader_t* UDPn = PCAPUDPHeader( N->Pkt[c] );
 
@@ -996,6 +993,7 @@ static inline void ProcessHashFull(u32 FID, PCAPFile_t* PCAP, PCAPPacket_t* Pkt,
 	bool HashIt = false;
 	switch (swap16(E->Proto))
 	{
+	case ETHER_PROTO_VLAN:
 	case ETHER_PROTO_IPV4:
 	{
 		IP4Header_t* IP4 = PCAPIP4Header(Pkt); 
@@ -1061,6 +1059,7 @@ static inline void ProcessHashPayload(u32 FID, PCAPFile_t* PCAP, PCAPPacket_t* P
 
 	switch (swap16(E->Proto))
 	{
+	case ETHER_PROTO_VLAN:
 	case ETHER_PROTO_IPV4:
 	{
 		IP4Header_t* IP4 = PCAPIP4Header(Pkt); 

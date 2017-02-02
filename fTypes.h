@@ -446,6 +446,7 @@ typedef struct
 } fEther_t;
 
 #define ETHER_PROTO_IPV4		0x0800 
+#define ETHER_PROTO_VLAN		0x8100
 #define ETHER_PROTO_MPLS		0x8847 
 
 typedef struct
