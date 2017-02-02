@@ -1153,7 +1153,7 @@ static void PrintLatencyHisto(u32 PCAPCnt, PCAPFile_t* PCAPFile[])
 	}
 	printf("\n");
 
-	if (PCAPCnt > 2)
+	if (PCAPCnt >= 2)
 	{
 		printf("Missing Packets:\n");
 		printf("  [%s] packets not in [%s] : %lli Pkts\n", PCAPFile[0]->Path, PCAPFile[1]->Path, s_FileDiffMissingA);  
